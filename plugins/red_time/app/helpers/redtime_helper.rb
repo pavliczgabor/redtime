@@ -1,0 +1,2 @@
+module RedtimeHelper
+end
