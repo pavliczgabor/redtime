@@ -1,1 +1,6 @@
 <h2>Ide kerül minden munkánk</h2>
+<a href="/static/testpage">Link a chartjs oldalra</a>
+<%  @project.time_entries.each do |entry|%>
+    <br>
+    Spent time: <%= entry.hours %> ,On issue: <%= entry.issue.subject %> <br>
+<% end %>
