@@ -1,62 +1,95 @@
-<canvas id="myChart"></canvas>
-<%= javascript_include_tag 'Chart.bundle.min.js' ,:plugin => 'redtime'%>
-<script>
-    //get size of the window
-    var myWidth = 0, myHeight = 0;
-      if( typeof( window.innerWidth ) == 'number' ) {
-        //Non-IE
-        myWidth = window.innerWidth;
-        myHeight = window.innerHeight;
-      } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-        //IE 6+ in 'standards compliant mode'
-        myWidth = document.documentElement.clientWidth;
-        myHeight = document.documentElement.clientHeight;
-      } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-        //IE 4 compatible
-        myWidth = document.body.clientWidth;
-        myHeight = document.body.clientHeight;
-      }
-      myHeight-=100;
 
-    var ctx = document.getElementById("myChart");
-    //setHeight of the canvas
-    ctx.setAttribute("width", myWidth);
-    ctx.setAttribute("height", myHeight);
-    
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+<%= javascript_include_tag 'Chart.bundle.min.js' ,:plugin => 'redtime' %>
+<%= javascript_include_tag 'Chart.utils.js' ,:plugin => 'redtime' %>
+
+<% require 'matrix' %>
+<% @mtx=Matrix.build(5,3) {rand(0 .. 9)}  %>
+<% @ma=Date.today-1 %>
+
+<div style="width:40%">
+  <table id="projectData">
+    <tr>
+      <th>Date</th>
+      <th>Sprint1</th> 
+      <th>Sprint2</th>
+      <th>Sprint3</th>
+    </tr>
+    <% (0..4).each do |i| %>
+        <tr>      
+          <td><%= @ma-i%></td>
+        <% (0..2).each do |j| %>  
+          <td><%= @mtx[i,j] %></td>        
+        <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>
+
+<div style="width: 60%" >
+    <canvas id="myChart"></canvas>
+</div>
+
+<script>
+    var barChartData = {
+            labels: [ "<%= @ma-4 %>", "<%= @ma-3 %>", "<%= @ma-2 %>", "<%= @ma-1 %>", "<%= @ma %>" ],
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
+                label: 'Sprint 1',
+                backgroundColor: window.chartColors.red,
+                data: [
+                    <%= @mtx[0,0] %>,
+                    <%= @mtx[1,0] %>,
+                    <%= @mtx[2,0] %>,
+                    <%= @mtx[3,0] %>,
+                    <%= @mtx[4,0] %>
+                ]
+            }, {
+                label: 'Sprint 2',
+                backgroundColor: window.chartColors.blue,
+                data: [
+                    <%= @mtx[0,1] %>,
+                    <%= @mtx[1,1] %>,
+                    <%= @mtx[2,1] %>,
+                    <%= @mtx[3,1] %>,
+                    <%= @mtx[4,1] %>
+                ]
+            }, {
+                label: 'Sprint 3',
+                backgroundColor: window.chartColors.green,
+                data: [
+                    <%= @mtx[0,2] %>,
+                    <%= @mtx[1,2] %>,
+                    <%= @mtx[2,2] %>,
+                    <%= @mtx[3,2] %>,
+                    <%= @mtx[4,2] %>
+                ]
             }]
-        },
+        };
+    
+window.onload = function(){
+    var ctx = document.getElementById("myChart").getContext("2d");
+    
+    window.myBar = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
         options: {
+            title:{
+                display:true,
+                text:"Chart.js Bar Chart - Stacked"
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            responsive: true,
             scales: {
+                xAxes: [{
+                    stacked: true,
+                }],
                 yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
+                    stacked: true
                 }]
             }
-        }
+        }         
     });
+};
 </script>
