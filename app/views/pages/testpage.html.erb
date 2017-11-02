@@ -5,21 +5,22 @@
 <% require 'matrix' %>
 <% @mtx=Matrix.build(5,3) {rand(0 .. 9)}  %>
 <% @ma=Date.today-1 %>
-
 <div style="width:40%">
   <table id="projectData">
     <tr>
+      <th>User</th>
       <th>Date</th>
-      <th>Sprint1</th> 
-      <th>Sprint2</th>
-      <th>Sprint3</th>
+      <% @dataToShow.numOfSprints.each do |sprint| %>
+      <th>Sprint <%= sprint %></th>
+      <% end %>
     </tr>
-    <% (0..4).each do |i| %>
-        <tr>      
-          <td><%= @ma-i%></td>
-        <% (0..2).each do |j| %>  
-          <td><%= @mtx[i,j] %></td>        
-        <% end %>
+    <% @dataToShow.dataItems.each do |item| %>
+        <tr>
+            <td><%= item.user %></td>
+            <td><%= item.date %></td>
+            <% item.sprints.each do |hoursOnSprint| %>
+            <td> <%= hoursOnSprint %></td>
+            <% end %>
         </tr>
     <% end %>
   </table>
@@ -74,7 +75,7 @@ window.onload = function(){
         options: {
             title:{
                 display:true,
-                text:"Chart.js Bar Chart - Stacked"
+                text:"<%= @dataToShow.projectName %>"
             },
             tooltips: {
                 mode: 'index',
