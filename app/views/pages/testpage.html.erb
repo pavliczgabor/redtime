@@ -10,8 +10,8 @@
     <tr>
       <th>User</th>
       <th>Date</th>
-      <% @dataToShow.numOfSprints.each do |sprint| %>
-      <th>Sprint <%= sprint %></th>
+      <% @dataToShow.namesOfSprints.each do |sprint| %>
+      <th><%= sprint %></th>
       <% end %>
     </tr>
     <% @dataToShow.dataItems.each do |item| %>

@@ -8,7 +8,7 @@ class PageController < ApplicationController
     datas<<DataItem.new("Mari",Date.today,[6, 0, 0, 2])
     datas<<DataItem.new("Mari",Date.today-1,[0, 0, 6, 2])
     datas<<DataItem.new("Mari",Date.today-2,[2, 0, 4, 2])
-    sprints=[1,2,3,4]
+    sprints=["1.Sprint","2.Sprint","3.Sprint","4.Sprint"]
     @dataToShow=DataStructure.new(datas,sprints,"valami")
     render template: "pages/#{params[:page]}"
   end

@@ -5,11 +5,11 @@
 class DataStructure
   extend ActiveModel::Naming
   
-  attr_accessor :dataItems, :numOfSprints, :projectName
+  attr_accessor :dataItems, :namesOfSprints, :projectName
  
-  def initialize(dataItems, numOfSprints, project)
+  def initialize(dataItems, namesOfSprints, project)
     @dataItems=dataItems
-    @numOfSprints=numOfSprints
+    @namesOfSprints=namesOfSprints
     @sprints=projectName
   end
   
