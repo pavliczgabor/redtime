@@ -2,9 +2,6 @@
 <%= javascript_include_tag 'Chart.bundle.min.js' ,:plugin => 'redtime' %>
 <%= javascript_include_tag 'Chart.utils.js' ,:plugin => 'redtime' %>
 
-<% require 'matrix' %>
-<% @mtx=Matrix.build(5,3) {rand(0 .. 9)}  %>
-<% @ma=Date.today-1 %>
 <table style="width:100%">
   <tr>
     <td style="width:80%">
