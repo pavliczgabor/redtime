@@ -5,65 +5,131 @@
 <% require 'matrix' %>
 <% @mtx=Matrix.build(5,3) {rand(0 .. 9)}  %>
 <% @ma=Date.today-1 %>
-<div style="width:40%">
-  <table id="projectData">
-    <tr>
-      <th>User</th>
-      <th>Date</th>
-      <% @dataToShow.namesOfSprints.each do |sprint| %>
-      <th><%= sprint %></th>
-      <% end %>
-    </tr>
-    <% @dataToShow.dataItems.each do |item| %>
-        <tr>
-            <td><%= item.user %></td>
-            <td><%= item.date %></td>
-            <% item.sprints.each do |hoursOnSprint| %>
-            <td> <%= hoursOnSprint %></td>
+<table style="width:100%">
+  <tr>
+    <td style="width:80%">
+        <div>
+          <table id="projectData">
+            <tr>
+              <th>User</th>
+              <th>Date</th>
+              <% @dataToShow.namesOfSprints.each do |sprint| %>
+              <th><%= sprint %></th>
+              <% end %>
+            </tr>
+            <% @dataToShow.dataItems.each do |item| %>
+                <tr>
+                    <td><%= item.user %></td>
+                    <td><%= item.date %></td>
+                    <% item.sprints.each do |hoursOnSprint| %>
+                    <td> <%= hoursOnSprint %></td>
+                    <% end %>
+                </tr>
             <% end %>
-        </tr>
-    <% end %>
-  </table>
-</div>
+          </table>
+        </div>
 
-<div style="width: 60%" >
-    <canvas id="myChart"></canvas>
-</div>
+        <div style="width:60%">
+            <canvas id="myChart"></canvas>
+        </div>
+    </td>
+    <td>
+      <form>
+        <div>
+          <label>Project:</label>
+          <br>
+          <select>
+            <% @options.projects.each do |project| %>
+                <option value="<%= project %>"> <%= project %></option>
+            <% end %>
+          </select>
+        </div>
+        <div>
+          <label>Sprint:</label>
+          <br>
+          <% @options.sprints.each do |sprint| %>
+              <input type="checkbox" name="sprint" value="<%= sprint %>">
+              <label><%= sprint %></label>
+          <% end %>
+        </div>
+        <div>
+          <label>Users:</label>
+          <br>
+          <% @options.names.each do |name| %>
+              <input type="checkbox" name="name" value="<%= name %>">
+              <label><%= name %></label>
+              <br>
+          <% end %>
+        </div>
+        <div>
+          <label>Date from:</label>
+          <br>
+          <input type="date" value="2017-09-04">
+        </div>
+        <div>
+          <label>Date to:</label>
+          <br>
+          <input type="date" value="<%= Date.today %>">
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    </td>
+
+  </tr>
+</table>
 
 <script>
+    <% dates = Array.new %>
+    <% @dataToShow.dataItems.each do |dataItem| %>
+      <% if !dates.include?(dataItem.date)%>
+        <% dates << dataItem.date %>
+      <% end %>
+    <% end %>
+    <% dates = dates.sort %>
+
+    <% sprintsByDates = Array.new %>
+    <% dates.each do |date| %>
+      <% dateSum = Array.new(@dataToShow.namesOfSprints.length, 0) %>
+      <% @dataToShow.dataItems.each do |dataItem| %>
+        <% if date == dataItem.date %>
+          <% dataItem.sprints.each_with_index do |v, i| %>
+            <% dateSum[i] += v %>
+         <% end %>
+        <% end %>
+      <% end %>
+      <% sprintsByDates << dateSum %>
+    <% end %>
+
     var barChartData = {
-            labels: [ "<%= @ma-4 %>", "<%= @ma-3 %>", "<%= @ma-2 %>", "<%= @ma-1 %>", "<%= @ma %>" ],
-            datasets: [{
-                label: 'Sprint 1',
-                backgroundColor: window.chartColors.red,
+            labels: [
+                <% dates.each do |date| %>
+                  "<%= date %>"
+                  <% if date != dates.last %>
+                    ,
+                  <% end %>
+                <% end %>
+                ],
+            datasets: [
+            <% colors = [ "window.chartColors.red", "window.chartColors.blue", "window.chartColors.green", "window.chartColors.yellow"] %>
+            <% @dataToShow.namesOfSprints.each_with_index do |sprint, i| %>
+            {
+                label: '<%= sprint %>',
+                backgroundColor: <%= colors[i] %>,
                 data: [
-                    <%= @mtx[0,0] %>,
-                    <%= @mtx[1,0] %>,
-                    <%= @mtx[2,0] %>,
-                    <%= @mtx[3,0] %>,
-                    <%= @mtx[4,0] %>
+                    <% sprintsByDates.each do |val|  %>
+                      <%= val[i] %>
+                      <% if sprintsByDates.last != val %>
+                      ,
+                      <% end %>
+                    <% end %>
+
                 ]
-            }, {
-                label: 'Sprint 2',
-                backgroundColor: window.chartColors.blue,
-                data: [
-                    <%= @mtx[0,1] %>,
-                    <%= @mtx[1,1] %>,
-                    <%= @mtx[2,1] %>,
-                    <%= @mtx[3,1] %>,
-                    <%= @mtx[4,1] %>
-                ]
-            }, {
-                label: 'Sprint 3',
-                backgroundColor: window.chartColors.green,
-                data: [
-                    <%= @mtx[0,2] %>,
-                    <%= @mtx[1,2] %>,
-                    <%= @mtx[2,2] %>,
-                    <%= @mtx[3,2] %>,
-                    <%= @mtx[4,2] %>
-                ]
-            }]
+            }
+                <% if @dataToShow.namesOfSprints.last != sprint %>
+                ,
+                <% end %>
+
+            <% end %>]
         };
     
 window.onload = function(){
@@ -94,3 +160,8 @@ window.onload = function(){
     });
 };
 </script>
+<style>
+    div + div{
+        margin-bottom:10px;
+    }
+</style>

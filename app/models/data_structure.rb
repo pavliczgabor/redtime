@@ -10,7 +10,7 @@ class DataStructure
   def initialize(dataItems, namesOfSprints, project)
     @dataItems=dataItems
     @namesOfSprints=namesOfSprints
-    @sprints=projectName
+    @project=projectName
   end
   
   def persisted?
