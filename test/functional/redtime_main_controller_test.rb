@@ -16,7 +16,7 @@ class RedtimeMainControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'index'
     assert_select 'h2', 'Ide kerül minden munkánk'
-    assert_select 'select#versions'
+    #assert_select 'select#versions'
   end
 
 end
