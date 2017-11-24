@@ -2,6 +2,9 @@
 <%= javascript_include_tag 'Chart.bundle.min.js' ,:plugin => 'redtime' %>
 <%= javascript_include_tag 'Chart.utils.js' ,:plugin => 'redtime' %>
 
+<% require 'matrix' %>
+<% @mtx=Matrix.build(5,3) {rand(0 .. 9)}  %>
+<% @ma=Date.today-1 %>
 <table style="width:100%">
   <tr>
     <td style="width:80%">
@@ -29,47 +32,6 @@
         <div style="width:60%">
             <canvas id="myChart"></canvas>
         </div>
-    </td>
-    <td>
-      <form>
-        <div>
-          <label>Project:</label>
-          <br>
-          <select>
-            <% @options.projects.each do |project| %>
-                <option value="<%= project %>"> <%= project %></option>
-            <% end %>
-          </select>
-        </div>
-        <div>
-          <label>Sprint:</label>
-          <br>
-          <% @options.sprints.each do |sprint| %>
-              <input type="checkbox" name="sprint" value="<%= sprint %>">
-              <label><%= sprint %></label>
-          <% end %>
-        </div>
-        <div>
-          <label>Users:</label>
-          <br>
-          <% @options.names.each do |name| %>
-              <input type="checkbox" name="name" value="<%= name %>">
-              <label><%= name %></label>
-              <br>
-          <% end %>
-        </div>
-        <div>
-          <label>Date from:</label>
-          <br>
-          <input type="date" value="2017-09-04">
-        </div>
-        <div>
-          <label>Date to:</label>
-          <br>
-          <input type="date" value="<%= Date.today %>">
-        </div>
-        <button type="submit">Submit</button>
-      </form>
     </td>
 
   </tr>
@@ -113,9 +75,9 @@
                 label: '<%= sprint %>',
                 backgroundColor: <%= colors[i] %>,
                 data: [
-                    <% sprintsByDates.each do |val|  %>
+                    <% sprintsByDates.each_with_index do |val, i|  %>
                       <%= val[i] %>
-                      <% if sprintsByDates.last != val %>
+                      <% if sprintsByDates.length-1 != i %>
                       ,
                       <% end %>
                     <% end %>

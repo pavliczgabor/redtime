@@ -1,0 +1,15 @@
+<h2>Ide kerül minden munkánk</h2>
+<a href="/pages/testpage">Link a chartjs tesztoldalra</a><br/>
+<%= form_tag("/redtime/timereport/report", method: "get") do %>
+    Project name: <%= @project.name %> <br/>
+    Sprints:<br/>
+    <input type="hidden" name="id" value="<%= @project.identifier %>">
+    <%= select_tag(:versions, options_for_select(@versions_selection),:multiple => true) %><br/>
+    Users:<br/>
+    <%= select_tag(:users, options_for_select(@users_selection),:multiple => true) %><br/>
+    From:<br/>
+    <%= date_field(:dates,:start_date) %><br/>
+    To:<br/>
+    <%= date_field(:dates, :end_date) %><br/>
+    <%= submit_tag("Submit") %>
+<% end %>

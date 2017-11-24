@@ -1,6 +1,4 @@
 <h2>Ide kerül minden munkánk</h2>
-<a href="/pages/testpage">Link a chartjs tesztoldalra</a>
-<%  @project.time_entries.each do |entry|%>
-    <br>
-    Spent time: <%= entry.hours %> ,On issue: <%= entry.issue.subject %> <br>
-<% end %>
+<a href="/pages/testpage">Link a chartjs tesztoldalra</a><br/>
+<a href="/redtime/timereport/filter?id=<%= @project.identifier %>">Napi ráfordítás</a>
+<a href="/redtime/timecomparisonreport/filter?id=<%= @project.identifier %>">Becslések alakulása</a>
