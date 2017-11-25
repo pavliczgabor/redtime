@@ -53,6 +53,6 @@ class TimeReportController < ApplicationController
         datas<<DataItem.new(users.detect{|user| user.id==user_id}.login,day,user_times_on_day)
       end
     end
-    @dataToShow = DataStructure.new(datas,sprints.map{|f| f.name},"valami")
+    @dataToShow = DataStructure.new(datas,sprints.map{|f| f.name},@project.name)
   end
 end
