@@ -59,13 +59,17 @@ class TimeComparisonReportController < ApplicationController
       end: end_date,
       p_id: @project.id
     }).where(
+        "estimated_hours is not null"
+    ).where(
         tracker_id: trackers.map{|f| f.id}
     ).where(fixed_version_id: sprints.map{|f| f.id})
-       
+    
+    spentOnSum=0;
     #datamaking
     (start_date..end_date).each do |date|
       newItem=EstimatedData.new(date,0,0,0);
       
+      newItem.leftSum-=spentOnSum
       issues.each do |issue|
         if !issue.closed_on || issue.closed_on>=date
             entries=TimeEntry.where("spent_on=:dd AND issue_id=:i_id",{
@@ -79,6 +83,7 @@ class TimeComparisonReportController < ApplicationController
             end
             newItem.estimatedSum+=issue.estimated_hours
             newItem.leftSum+=issue.estimated_hours-spentOnIssue
+            spentOnSum+=spentOnIssue
         end
       end
       datas<<newItem
