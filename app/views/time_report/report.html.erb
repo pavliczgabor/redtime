@@ -75,9 +75,9 @@
                 label: '<%= sprint %>',
                 backgroundColor: <%= colors[i] %>,
                 data: [
-                    <% sprintsByDates.each_with_index do |val, i|  %>
+                    <% sprintsByDates.each_with_index do |val, j|  %>
                       <%= val[i] %>
-                      <% if sprintsByDates.length-1 != i %>
+                      <% if sprintsByDates.length-1 != j %>
                       ,
                       <% end %>
                     <% end %>
