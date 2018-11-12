@@ -1,0 +1,48 @@
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+        ['Nap','Hátralevő munka órák', 'Hátralevő feladatok', 'Hátralevő tartalék idő'],
+        <% @dataItems.each do |item| %>
+            <%remaining_work_hour = item.remaining_hours.map{|i, k| k[:remaining_work_hour]}[0]
+              remaining_issue_hour = item.remaining_hours.map{|i, k| k[:remaining_issue_hour]}[0]
+              remaining_free_hours = remaining_work_hour - remaining_issue_hour%>
+          [<%=item.remaining_hours.map{|i, t| i.day}[0]%>,  <%=item.remaining_hours.map{|i, t| t[:remaining_work_hour]}[0]%>,  <%=item.remaining_hours.map{|i, t| t[:remaining_issue_hour]}[0]%>, <%=remaining_free_hours%> ]
+          <% if item != @dataItems.last %>
+          ,
+          <% end %>
+        <% end %>
+        ]);
+          var options = {
+          title: 'A <%= @project.name %> projekt statisztikája ',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <%= render "redtime_main/selection" %>
+    <%= form_tag("/timevisualizer", method: "get") do %>
+      <%= hidden_field_tag :id, @project.id %>
+
+      Sprints:<br />
+
+      <%= select_tag(:sprints, options_for_select(@sprints_selection),:multiple => true) %><br/>
+
+      Tracks: <br />
+
+      <%= select_tag(:trackers, options_for_select(@trackers_selection),:multiple => true) %><br/>
+
+      <%= submit_tag("Submit") %>
+    <% end %>
+
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+  </body>
