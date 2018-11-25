@@ -34,6 +34,7 @@
     <%= form_tag("/timevisualizer", method: "get") do %>
       <%= hidden_field_tag :id, @project.id %>
 
+      <%= render "redtime_main/selection" %>
       Sprints:<br />
 
       <%= select_tag(:sprints, options_for_select(@sprints_selection),:multiple => true) %><br/>
