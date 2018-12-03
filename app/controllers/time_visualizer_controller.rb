@@ -52,44 +52,55 @@ class TimeVisualizerController < ApplicationController
   def calculate_graph
     @dataItems = []
 
-    #TODO: dokumentacio ir szurest a "projekthez rendelt megadott szerepkoru felhasznalora" is
     issues = Issue.where(fixed_version: @sprints, tracker: @trackers)
-    time_entries = TimeEntry.where(issue: issues)
-    journals = Journal.where(journalized: issues)
-    journal_details = JournalDetail.where(journal: journals) if !journals.empty?
+    time_entries = TimeEntry.where(issue: issues).order(:created_on) || []
+    journals = Journal.where(journalized: issues).order(:created_on) || []
+    journal_details = JournalDetail.where(journal: journals) || []
     work_hour_per_week = 0
     @project.members.each do |member|
       work_hour_per_week += member.user.custom_field_value(UserCustomField.find_by(name: "Munkaóra/Hét").id).to_i
     end
+    issue_hours = 0
     start_date = @sprints.first.created_on.to_date
     end_date = @sprints.last.effective_date.to_date
-    issue_hours = 0
     added_issues = []
     added_time_entires = []
+    added_journals = []
+
     for date in start_date..end_date
       work_days = (end_date - date).to_f
       issues.each do |issue|
-        if issue.created_on.to_date <= date
+        issue_journals =[]
+        journals.where(journalized: issue).each{|journal| journal.created_on==date ? issue_journals << journal : next}
+        issue_journal_details = journal_details.where(journal: issue_journals, prop_key: "fixed_version_id", value: @sprints.ids)
+
+        if !issue_journal_details.empty? || issue.created_on.to_date == date
           if !added_issues.find {|is| is[:issue] == issue}.present?
-            added_issues << {:issue => issue, :time_left => issue.estimated_hours || 0, :finished => false}
+            added_issues << {:issue => issue, :time_left => issue.estimated_hours, :finished => false}
             issue_hours += issue.estimated_hours || 0
           end
           time_entries.where(issue: issue).each do |te|
             if !added_time_entires.include?(te) && te.spent_on <= date && !added_issues.find {|is| is[:issue] == issue}[:finished]
               added_time_entires << te
-              issue_hours -= te.hours
-              puts added_issues.find {|is| is[:issue] == issue}[:time_left].class
-              added_issues.find {|is| is[:issue] == issue}[:time_left] -= te.hours
+              if !issue.estimated_hours.nil?
+                issue_hours -= te.hours
+                added_issues.find {|is| is[:issue] == issue}[:time_left] -= te.hours
+              end
             end
           end
         end
         if !journals.empty?
           journals.where(journalized: issue).each do |jo|
-            if jo.created_on.to_date == date && !journal_details.where(journal: jo, prop_key: "status_id", old_value: %w[1 2], value: "3").empty? &&
-                added_issues.find {|is| is[:issue] == issue}[:time_left] > 0
-              issue_hours -= added_issues.find {|is| is[:issue] == issue}[:time_left]
-              added_issues.find {|is| is[:issue] == issue}[:time_left] = 0
+            if !added_journals.include?(jo) && jo.created_on.to_date == date && !journal_details.where(journal: jo, prop_key: "status_id", old_value: %w[1 2], value: %w[3 4 5 6]).empty? &&
+                ((time=added_issues.find {|is| is[:issue] == issue}[:time_left]).nil? ? time=0 : time > 0)
+              added_journals<<jo
+              issue_hours -= time
               added_issues.find {|is| is[:issue] == issue}[:finished] = true
+            elsif !added_journals.include?(jo) && jo.created_on.to_date == date && !journal_details.where(journal: jo, prop_key: "status_id", old_value: %w[3 4 5 6], value: %w[1 2]).empty? &&
+                ((time=added_issues.find {|is| is[:issue] == issue}[:time_left]).nil? ? time=0 : time > 0)
+              added_journals<<jo
+              issue_hours += time
+              added_issues.find {|is| is[:issue] == issue}[:finished] = false
             end
           end
         end
